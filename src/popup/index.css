@@ -1,0 +1,45 @@
+.popup-container {
+  width: 300px;
+  padding: 15px;
+  font-family: Arial, sans-serif;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.success {
+  text-align: center;
+  color: #4caf50;
+}
+
+.tick {
+  font-size: 40px;
+}
+
+#resume-form fieldset {
+  border: none;
+  padding: 0;
+}
+
+#resume-form label {
+  display: block;
+  margin-bottom: 10px;
+}
+
+#resume-form input[type="file"] {
+  padding: 5px;
+}
+
+#resume-form button {
+  padding: 5px 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+#error-message {
+  color: red;
+  margin-top: 10px;
+}

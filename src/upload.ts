@@ -1,4 +1,4 @@
-import * as pdfjsLib from 'pdfjs-dist';
+import { getDocument } from 'pdfjs-dist';
 
 document.getElementById('resume-form')?.addEventListener('submit', async (e: Event) => {
   e.preventDefault();
@@ -21,7 +21,7 @@ document.getElementById('resume-form')?.addEventListener('submit', async (e: Eve
     const pdfContent = event.target?.result as ArrayBuffer;
 
     // Using PDF.js to get the number of pages
-    const pdf = await pdfjsLib.getDocument({ data: pdfContent }).promise;
+    const pdf = await getDocument({ data: pdfContent }).promise;
     if (pdf.numPages > 2) {
       document.getElementById('error-message')!.innerText = 'PDF must be no more than 2 pages.';
       return;

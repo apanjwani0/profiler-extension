@@ -1,16 +1,19 @@
 // Function to extract the job description
 function getJobDescription(): string | null {
-  // Logic to extract the job description based on the page's HTML structure
-  // For example, assuming the job description is inside an element with a specific class name:
-  const jobDescriptionElement = document.querySelector('.job-description-class') as HTMLElement;
+  const jobDescriptionElement = document.querySelector('.jobs-description-content') as HTMLElement;
   return jobDescriptionElement ? jobDescriptionElement.innerText : null;
 }
-  
-  // Listen for a message from the background script
-  chrome.runtime.onMessage.addListener((request: { action: string }, sender: chrome.runtime.MessageSender, sendResponse: (response?: string) => void) => {
-    if (request.action === 'getJobDescription') {
-      const jobDescription = getJobDescription();
-      sendResponse(jobDescription);
-    }
-  });
-  
+
+// Listen for a message from the background script
+chrome.runtime.onMessage.addListener((request: { action: string }, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
+  if (request.action === 'getJobDescription') {
+    const jobDescription = getJobDescription();
+    console.log('Sending job description:', jobDescription); // Log the job description
+    sendResponse(jobDescription);
+  } else if (request.action === 'analyzePage') {
+    // Extract page content
+    const pageContent = document.documentElement.innerHTML;
+    console.log('Sending page content:', pageContent); // Log the page content
+    sendResponse({ pageContent, apiCalls: 'API call details here' });
+  }
+});
