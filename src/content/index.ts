@@ -1,4 +1,6 @@
 // content.ts
+console.log('Content script loaded!');
+
 
 function checkEligibility() : boolean{
   if (window.location.href.includes('linkedin.com/jobs/collections/recommended/?currentJobId=')) {

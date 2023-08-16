@@ -25,33 +25,6 @@ const Popup: React.FC = () => {
   );
 };
 
-// // Listen for a message from the background script
-// chrome.runtime.onMessage.addListener((request: { action: string }, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
-//   console.log(request);
-//   switch (request.action) {
-//     case "getJobDescription":
-//       const jobDescription = getJobDescription();
-//       console.log('Sending job description:', jobDescription);
-//       sendResponse(jobDescription);
-//       break;
-//     case "analyzePage":
-//       const pageContent = document.documentElement.innerHTML;
-//       console.log('Sending page content:', pageContent);
-//       sendResponse({ pageContent, apiCalls: 'API call details here' });
-//       break;
-//     default:
-//       sendResponse('unknown request');
-//       break;
-//   }
-//   //Return true to indicate that sendResponse will be called asynchronously
-//   return true;
-// });
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   chrome.runtime.sendMessage({ action: 'checkEligibility' }, (response) => {
-//     // Handle response if needed
-//   });
-// });
 
 // popup.ts
 
@@ -65,14 +38,16 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 
-// popup.ts
-
 document.addEventListener('DOMContentLoaded', () => {
   chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
     const activeTab = tabs[0];
     chrome.tabs.sendMessage(activeTab.id!, { action: 'checkEligibility' }, (response) => {
-      console.log("response", response);
-      updateStatus(response?.supported);
+      if (chrome.runtime.lastError) {
+        console.error(chrome.runtime.lastError.message);
+      } else {
+        console.log("response", response);
+        updateStatus(response?.supported);
+      }
     });
   });
 });
@@ -87,8 +62,6 @@ function updateStatus(supported: boolean) {
     // statusElement!.innerHTML = '<span style="color:red">✗ Not Supported</span>';
   }
 }
-
-
 
 
 ReactDOM.render(
