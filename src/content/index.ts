@@ -1,19 +1,38 @@
+// content.ts
+
+function checkEligibility() : boolean{
+  if (window.location.href.includes('linkedin.com/jobs/collections/recommended/?currentJobId=')) {
+    return _fetchLinkedIn();
+  } else {
+    notSupported();
+    return false;
+  }
+}
+
 // Function to extract the job description
-function getJobDescription(): string | null {
+function __getJobDescription(): string | null {
   const jobDescriptionElement = document.querySelector('.jobs-description-content') as HTMLElement;
   return jobDescriptionElement ? jobDescriptionElement.innerText : null;
 }
 
-// Listen for a message from the background script
-chrome.runtime.onMessage.addListener((request: { action: string }, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
-  if (request.action === 'getJobDescription') {
-    const jobDescription = getJobDescription();
-    console.log('Sending job description:', jobDescription); // Log the job description
-    sendResponse(jobDescription);
-  } else if (request.action === 'analyzePage') {
-    // Extract page content
-    const pageContent = document.documentElement.innerHTML;
-    console.log('Sending page content:', pageContent); // Log the page content
-    sendResponse({ pageContent, apiCalls: 'API call details here' });
+function _fetchLinkedIn(): boolean {
+  const forms = document.forms;
+  const jobDescription = __getJobDescription();
+  console.log('Sending job description:', jobDescription);
+  console.log("forms", forms);
+  return (forms.length > 0 ? true : false );
+}
+
+function notSupported() {
+  console.log('The site is not supported');
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'checkEligibility') {
+    const result = checkEligibility();
+    sendResponse({ supported: result });
+  } else {
+    console.log('Invalid message', message, sender);
   }
+  return true;
 });
