@@ -12,22 +12,21 @@ Profiler is a Chrome Extension designed to enhance the job-seeking experience on
 
 1. **Clone the Repository**: Clone the project to your local machine.
 
-   \```bash
-   git clone https://github.com/yourusername/profiler-extension.git
-   \```
+   ```bash
+   git clone https://github.com/yourusername/profiler-extension.git```
 
 2. **Install Dependencies**: Navigate to the project directory and install the required dependencies.
 
-   \```bash
+   ```bash
    cd profiler-extension
    npm install
-   \```
+   ```
 
 3. **Build the Extension**: Compile the TypeScript files and prepare the extension for loading.
 
-   \```bash
+   ```bash
    npm run build
-   \```
+   ```
 
 4. **Load the Extension in Chrome**:
    - Open Chrome and navigate to `chrome://extensions/`.
@@ -43,7 +42,7 @@ Profiler is a Chrome Extension designed to enhance the job-seeking experience on
 
 The project is structured as follows:
 
-\```
+```
 project-root/
 ├── src/
 │   ├── background/       # Background scripts
@@ -56,7 +55,7 @@ project-root/
 ├── build/                # Compiled output
 ├── package.json          # Project dependencies
 └── webpack.config.js     # Webpack configuration
-\```
+```
 
 ### Scripts
 
