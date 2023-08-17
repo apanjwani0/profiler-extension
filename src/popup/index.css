@@ -1,4 +1,4 @@
-.popup-container {
+/* .popup-container {
   width: 300px;
   padding: 15px;
   font-family: Arial, sans-serif;
@@ -94,4 +94,30 @@
   background-color: #f2dede;
   padding: 10px;
   border-radius: 5px;
+} */
+
+
+.popup-container {
+  width: 300px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.navbar {
+  background: linear-gradient(45deg, #6C5B7B, #C06C84);
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+}
+
+.navbar a {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
 }
