@@ -16,35 +16,59 @@ enum AnalysisState {
   NotSupported,
 }
 
+enum LoadingState {
+  Initializing,
+  Loaded,
+  Error
+}
+
 const Popup: React.FC = () => {
   const [state, setState] = useState(AnalysisState.Analyzing);
+  const [loadingState, setLoadingState] = useState(LoadingState.Initializing);
+
+  function updateStatus(supported: boolean) {
+    if (supported) {
+      console.log("Supported");
+      setState(AnalysisState.Compatible);
+    } else {
+      console.log("Not Supported");
+      setState(AnalysisState.NotSupported);
+    }
+    setLoadingState(LoadingState.Loaded)
+  }
+
+  useEffect(() => {
+    if (loadingState === LoadingState.Initializing) {
+        sendMessageToContentScript(updateStatus);
+    }
+}, [loadingState]);
 
   return (
     <div className="popup-container">
-      {/* Pass both state and setState to the AnalysisStatus component */}
-      <AnalysisStatus state={state} setState={setState} />
-      {state === AnalysisState.Compatible && <UploadForm />}
+        <div className="navbar">
+        <a href="#profile">Profile</a>
+        <a href="#home">Home</a>
+        <a href="#about">About</a>
+        </div>
+        {loadingState === LoadingState.Initializing && <p>Initializing...</p>}
+        {loadingState === LoadingState.Error && <p>Error loading content. Please try again.</p>}
+        {loadingState === LoadingState.Loaded && (
+            <>
+                <AnalysisStatus state={state} setState={setState} />
+                {state === AnalysisState.Compatible && <UploadForm />}
+            </>
+        )}
     </div>
-  );
+);
 };
 
 
 // popup.ts
 
-
-chrome.runtime.onMessage.addListener((message) => {
-  const statusElement = document.getElementById('status');
-  if (message.supported) {
-    statusElement!.innerHTML = '<span style="color:green">✓ Supported</span>';
-  } else {
-    statusElement!.innerHTML = '<span style="color:red">✗ Not Supported</span>';
-  }
-});
-
 const MAX_RETRIES = 5;
 let retries = 0;
 
-function sendMessageToContentScript() {
+function sendMessageToContentScript(updateStatus: (supported: boolean) => void) {
   chrome.storage.local.get(['contentScriptLoaded'], (result) => {
     console.log(result)
     if (result.contentScriptLoaded) {
@@ -78,24 +102,11 @@ function sendMessageToContentScript() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', sendMessageToContentScript);
-
-function updateStatus(supported: boolean) {
-  const statusElement = document.getElementById('status');
-  if (supported) {
-    console.log("Supported")
-    // statusElement!.innerHTML = '<span style="color:green">✓ Supported</span>';
-  } else {
-    console.log("Not Supported")
-    // statusElement!.innerHTML = '<span style="color:red">✗ Not Supported</span>';
-  }
-}
-
-
-const root = createRoot(document.getElementById('root'));
-
-root.render(
-  <React.StrictMode>
-    <Popup />
-  </React.StrictMode>,
-);
+document.addEventListener('DOMContentLoaded', () => {
+  const root = createRoot(document.getElementById('root'));
+  root.render(
+    <React.StrictMode>
+      <Popup />
+    </React.StrictMode>,
+  );
+});

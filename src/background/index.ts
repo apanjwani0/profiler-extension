@@ -12,7 +12,6 @@ chrome.runtime.onInstalled.addListener(({ reason }) => {
 
 chrome.runtime.onStartup.addListener(onExtensionStartup);
 
-// chrome.tabs.onActivated.addListener(moveToFirstPosition);
 
 chrome.tabs.onActivated.addListener(getCurrentTab);
 
@@ -24,17 +23,6 @@ function onExtensionStartup() {
 
 async function getCurrentTab() {
   console.log("getCurrentTab")
-
-  chrome.scripting
-    .registerContentScripts([{
-      id: "session-script",
-      js: ["content.bundle.js"],
-      persistAcrossSessions: false,
-      matches: ["<all_urls>"],
-      runAt: "document_start",
-    }])
-    .then(() => console.log("registration complete"))
-    .catch((err) => console.error("unexpected error", err))
 
   let queryOptions = { active: true, lastFocusedWindow: true };
   // `tab` will either be a `tabs.Tab` instance or `undefined`.
@@ -63,17 +51,6 @@ function showReadme() {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === 'reloadContentScript') {
-    // chrome.scripting
-    //   .registerContentScripts([{
-    //     id: "session-script",
-    //     js: ["content.bundle.js"],
-    //     persistAcrossSessions: false,
-    //     matches: ["<all_urls>"],
-    //     runAt: "document_start",
-    //   }])
-    //   .then(() => console.log("registration complete", sendResponse(true)))
-    //   .catch((err) => console.error("unexpected error", err, sendResponse(false)))
-
     chrome.scripting
       .getRegisteredContentScripts()
       .then(scripts => console.log("registered content scripts", scripts));
