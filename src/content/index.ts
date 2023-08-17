@@ -1,10 +1,13 @@
 // content.ts
 console.log('Content script loaded!');
+chrome.storage.local.set({ 'contentScriptLoaded': true });
 
 
 function checkEligibility() : boolean{
   if (window.location.href.includes('linkedin.com/jobs/collections/recommended/?currentJobId=')) {
-    return _fetchLinkedIn();
+    console.log(window.location.href);
+    _fetchLinkedIn();
+    return true;
   } else {
     notSupported();
     return false;
@@ -14,6 +17,7 @@ function checkEligibility() : boolean{
 // Function to extract the job description
 function __getJobDescription(): string | null {
   const jobDescriptionElement = document.querySelector('.jobs-description-content') as HTMLElement;
+  console.log(jobDescriptionElement)
   return jobDescriptionElement ? jobDescriptionElement.innerText : null;
 }
 

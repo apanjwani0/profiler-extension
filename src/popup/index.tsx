@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import AnalysisStatus from './analysisStatus';
 import UploadForm from './uploadForm';
+import { createRoot } from 'react-dom/client';
+
+const extensionId: string = "gipnljfmaephpakbhgpfahbjcpoibdpl";
 
 console.log('Popup script loaded!');
 
@@ -28,6 +31,7 @@ const Popup: React.FC = () => {
 
 // popup.ts
 
+
 chrome.runtime.onMessage.addListener((message) => {
   const statusElement = document.getElementById('status');
   if (message.supported) {
@@ -37,20 +41,44 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 });
 
+const MAX_RETRIES = 5;
+let retries = 0;
 
-document.addEventListener('DOMContentLoaded', () => {
-  chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
-    const activeTab = tabs[0];
-    chrome.tabs.sendMessage(activeTab.id!, { action: 'checkEligibility' }, (response) => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError.message);
-      } else {
-        console.log("response", response);
-        updateStatus(response?.supported);
-      }
-    });
+function sendMessageToContentScript() {
+  chrome.storage.local.get(['contentScriptLoaded'], (result) => {
+    console.log(result)
+    if (result.contentScriptLoaded) {
+      chrome.tabs.query({ active: true, lastFocusedWindow: true }, (tabs) => {
+        const activeTab = tabs[0];
+        console.log("activeTab", activeTab);
+        chrome.tabs.sendMessage(activeTab.id!, { action: 'checkEligibility' }, (response) => {
+          if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError.message);
+          } else {
+            console.log("response", response);
+            updateStatus(response?.supported);
+          }
+        });
+      });
+    } else if (retries < MAX_RETRIES) {
+      console.error('Content script not loaded yet. Retrying...');
+      retries++;
+      chrome.runtime.sendMessage(extensionId, { action: 'reloadContentScript' }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(chrome.runtime.lastError.message);
+        } else {
+          console.log("response", response);
+          // updateStatus(response?.supported);
+        }
+      });
+      setTimeout(sendMessageToContentScript, 1000); // Retry after 1 second
+    } else {
+      console.error('Reached maximum retries. Content script might not be loaded.');
+    }
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', sendMessageToContentScript);
 
 function updateStatus(supported: boolean) {
   const statusElement = document.getElementById('status');
@@ -64,9 +92,10 @@ function updateStatus(supported: boolean) {
 }
 
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+
+root.render(
   <React.StrictMode>
     <Popup />
   </React.StrictMode>,
-  document.getElementById('root')
 );

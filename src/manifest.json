@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Profiler",
   "version": "1.0",
+
   "description": "Extension for profiler",
   "permissions": [
     "activeTab",
@@ -9,7 +10,8 @@
     "management",
     "tabs",
     "webNavigation",
-    "webRequest"
+    "webRequest",
+    "scripting"
   ],
   "host_permissions": [
       "http://localhost:3000/*"
@@ -19,6 +21,7 @@
   },
   "content_scripts": [
     {
+      "all_frames": true,
       "matches": ["<all_urls>"],
       "js": ["content.bundle.js"]
     }

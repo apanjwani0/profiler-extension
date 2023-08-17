@@ -5,13 +5,14 @@ const extensionId: string = "gipnljfmaephpakbhgpfahbjcpoibdpl";
 chrome.runtime.onInstalled.addListener(({ reason }) => {
   if (reason === chrome.runtime.OnInstalledReason.INSTALL) {
     showReadme();
+
   }
 });
 
 
 chrome.runtime.onStartup.addListener(onExtensionStartup);
 
-chrome.tabs.onActivated.addListener(moveToFirstPosition);
+// chrome.tabs.onActivated.addListener(moveToFirstPosition);
 
 chrome.tabs.onActivated.addListener(getCurrentTab);
 
@@ -23,6 +24,17 @@ function onExtensionStartup() {
 
 async function getCurrentTab() {
   console.log("getCurrentTab")
+
+  chrome.scripting
+    .registerContentScripts([{
+      id: "session-script",
+      js: ["content.bundle.js"],
+      persistAcrossSessions: false,
+      matches: ["<all_urls>"],
+      runAt: "document_start",
+    }])
+    .then(() => console.log("registration complete"))
+    .catch((err) => console.error("unexpected error", err))
 
   let queryOptions = { active: true, lastFocusedWindow: true };
   // `tab` will either be a `tabs.Tab` instance or `undefined`.
@@ -47,3 +59,45 @@ async function moveToFirstPosition(activeInfo: { tabId: number; }) {
 function showReadme() {
   chrome.tabs.create({ url: '/index.html' });
 }
+
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === 'reloadContentScript') {
+    // chrome.scripting
+    //   .registerContentScripts([{
+    //     id: "session-script",
+    //     js: ["content.bundle.js"],
+    //     persistAcrossSessions: false,
+    //     matches: ["<all_urls>"],
+    //     runAt: "document_start",
+    //   }])
+    //   .then(() => console.log("registration complete", sendResponse(true)))
+    //   .catch((err) => console.error("unexpected error", err, sendResponse(false)))
+
+    chrome.scripting
+      .getRegisteredContentScripts()
+      .then(scripts => console.log("registered content scripts", scripts));
+  } else {
+    console.log('Invalid message', message, sender);
+    sendResponse(false)
+  }
+  return true;
+});
+
+
+
+chrome.scripting
+  .getRegisteredContentScripts()
+  .then(scripts => console.log("registered content scripts", scripts));
+
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  console.log("Here")
+  if (changeInfo.status === 'complete' && /^http/.test(tab.url)) {
+    chrome.scripting.executeScript({
+      
+      target: { tabId: tabId },
+      files: ['content.bundle.js']
+    });
+  }
+});
